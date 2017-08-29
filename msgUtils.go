@@ -11,10 +11,10 @@ func msgGit(s *discordgo.Session, m *discordgo.MessageCreate, _ []string) {
 }
 
 func msgGame(s *discordgo.Session, m *discordgo.MessageCreate, msglist []string) {
-	err := s.UpdateStatus(0, strings.Join(msglist[1:], " "))
+	err := s.UpdateStatus(0, strings.Join(msglist, " "))
 	if err != nil {
 		s.ChannelMessageEdit(m.ChannelID, m.Message.ID, "Error setting game")
 		return
 	}
-	s.ChannelMessageEdit(m.ChannelID, m.Message.ID, "Game set to `"+strings.Join(msglist[1:], " ")+"`")
+	s.ChannelMessageEdit(m.ChannelID, m.Message.ID, "Game set to `"+strings.Join(msglist, " ")+"`")
 }

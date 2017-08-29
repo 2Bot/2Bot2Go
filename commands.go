@@ -16,33 +16,27 @@ var (
 		Name: "git",
 		Help: "Args: none\n\nLinks 2Bots github page.\n\nExample:\n`!owo git`",
 		Exec: msgGit,
-	}
+	}.add()
 	emojiCommand = command{
 		Name: "",
 		Help: "Args: [emoji]\n\nSends a large image of the given emoji.\n\nExample:\n`!owo :smile:`",
 		Exec: msgEmoji,
-	}
+	}.add()
 	gameCommand = command{
 		Name: "setGame",
 		Help: "Args: [game]\n\nSets your current game to 'game'",
 		Exec: msgGame,
-	}
+	}.add()
 	findEmojiCommand = command{
 		Name: "findEmoji",
 		Help: "Args: [emoji]\n\nReturns all the emojis that match the given emoji in all the servers you are in",
 		Exec: msgFindEmoji,
-	}
+	}.add()
 )
 
 //Small wrapper function to reduce clutter
 func l(s string) (r string) {
 	return strings.ToLower(s)
-}
-
-func loadCommands() {
-	commMap[l(gitCommand.Name)]   = gitCommand
-	commMap[l(emojiCommand.Name)] = emojiCommand
-	commMap[l(gameCommand.Name)] = gameCommand
 }
 
 func parseCommand(s *discordgo.Session, m *discordgo.MessageCreate, message string) {
@@ -68,7 +62,7 @@ func parseCommand(s *discordgo.Session, m *discordgo.MessageCreate, message stri
 	}
 
 	if command == l(commMap[command].Name) {
-		commMap[command].Exec(s, m, msglist)
+		commMap[command].Exec(s, m, msglist[1:])
 		return
 	}
 
@@ -101,7 +95,7 @@ func listCommands(s *discordgo.Session, m *discordgo.MessageCreate) {
 	})
 }
 
-func (c *command) helpCommand(s *discordgo.Session, m *discordgo.MessageCreate) {
+func (c command) helpCommand(s *discordgo.Session, m *discordgo.MessageCreate) {
 	userColor := s.State.UserColor(s.State.User.ID, m.ChannelID)
 
 	s.ChannelMessageDelete(m.ChannelID, m.Message.ID)
@@ -115,4 +109,9 @@ func (c *command) helpCommand(s *discordgo.Session, m *discordgo.MessageCreate) 
 		},
 	})
 	return
+}
+
+func (c command) add() command {
+	commMap[l(c.Name)] = c
+	return c
 }

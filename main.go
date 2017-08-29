@@ -1,29 +1,30 @@
 package main
 
 import (
-	"log"
-	"io/ioutil"
-	"strings"
-	"time"
-	"os"
 	"fmt"
-	"syscall"
+	"io/ioutil"
+	"log"
+	"os"
 	"os/signal"
 	"regexp"
+	"strings"
+	"syscall"
+	"time"
+
+	"github.com/BurntSushi/toml"
 	"github.com/bwmarrin/discordgo"
-	"github.com/BurntSushi/toml"	
 )
 
 type config struct {
-	Token string `toml:"token"`
+	Token  string `toml:"token"`
 	Prefix string `toml:"prefix"`
 }
 
 var (
-	dg *discordgo.Session
-	conf = &config{}
-	emojiRegex   = regexp.MustCompile("<:.*?:(.*?)>")	
-	loginTime time.Time
+	dg         *discordgo.Session
+	conf       = &config{}
+	emojiRegex = regexp.MustCompile("<:(.*?):(.*?)>")
+	loginTime  time.Time
 )
 
 func createConfig() error {
@@ -34,7 +35,7 @@ func createConfig() error {
 	if err != nil {
 		return err
 	}
-	
+
 	inputPrefix()
 
 	file, err := os.OpenFile("config.toml", os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0660)
@@ -47,7 +48,7 @@ func createConfig() error {
 	err = toml.NewEncoder(file).Encode(conf)
 	if err != nil {
 		fmt.Println("Error creating config\n", err)
-		return err		
+		return err
 	}
 
 	return nil
@@ -57,7 +58,7 @@ func inputToken() error {
 	fmt.Println("\nFirst, I'll need your user token. To do that, follow these instructions:")
 	fmt.Println("1. Type Ctrl-Shift-i\n2. Click on the tab labelled 'Application'\n3. Click 'Local Storage', and then https://discordapp.com")
 	fmt.Println("4. Then copy paste the long string of random characters here, but WITHOUT THE QUOTATION MARKS! Thats very important")
-	
+
 	fmt.Print("\nPaste your token here: ")
 	fmt.Scanln(&conf.Token)
 	err := testLogin()
@@ -79,13 +80,13 @@ func inputPrefix() {
 	for {
 		fmt.Scanln(&ws)
 		switch strings.ToLower(ws) {
-			case "y":
-				conf.Prefix += " "
-				return
-			case "n":
-				return
-			default:
-				fmt.Println("Please type y or n")
+		case "y":
+			conf.Prefix += " "
+			return
+		case "n":
+			return
+		default:
+			fmt.Println("Please type y or n")
 		}
 	}
 
@@ -104,7 +105,7 @@ func testLogin() error {
 	if err != nil {
 		return err
 	}
-	
+
 	fmt.Println("\rToken is valid!")
 	return nil
 }
@@ -124,38 +125,31 @@ func loadConfig() error {
 }
 
 func main() {
-	
+
 	_, err := toml.DecodeFile("config.toml", &conf)
 	if os.IsNotExist(err) {
-		err = createConfig()
-		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
+		if err = createConfig(); err != nil {
+			log.Fatalln(err)
 		}
-	}else {
-		err = loadConfig()
-		if err != nil || conf.Prefix == "" || conf.Token == "" {
-			fmt.Println(err)
-			os.Exit(1)
+	} else {
+		if err = loadConfig(); err != nil || conf.Prefix == "" || conf.Token == "" {
+			log.Fatalln(err)
 		}
 	}
 
 	if dg == nil {
 		if err = testLogin(); err != nil {
-			fmt.Println(err)
+			log.Fatalln(err)
 		}
 	}
 
 	loginTime = time.Now()
-	err = dg.Open()
-	if err != nil {
+	if err = dg.Open(); err != nil {
 		log.Fatalln(err)
 	}
 
 	dg.AddHandlerOnce(ready)
 	dg.AddHandler(message)
-
-	loadCommands()
 
 	sc := make(chan os.Signal, 1)
 	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt, os.Kill)
