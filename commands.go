@@ -29,7 +29,7 @@ var (
 	}.add()
 	findEmojiCommand = command{
 		Name: "findEmoji",
-		Help: "Args: [emoji]\n\nReturns all the emojis that match the given emoji in all the servers you are in",
+		Help: "Args: [emoji | name]\n\nReturns all the emojis that match the given emoji or emoji name in all the servers you are in",
 		Exec: msgFindEmoji,
 	}.add()
 )

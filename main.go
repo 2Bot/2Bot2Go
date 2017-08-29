@@ -79,7 +79,7 @@ func inputPrefix() {
 	fmt.Scanln(&conf.Prefix)
 	var ws string
 	for {
-		fmt.Print("Do you want a space at the end of your prefix? (y/n) ")		
+		fmt.Print("Do you want a space at the end of your prefix? (y/n) ")
 		fmt.Scanln(&ws)
 		switch strings.ToLower(ws) {
 		case "y":
@@ -109,8 +109,8 @@ func testLogin() error {
 	}
 
 	fmt.Println("\rToken is valid!")
-	infoLog.Println("\rToken is valid!")	
-	
+	infoLog.Println("\rToken is valid!")
+
 	return nil
 }
 
@@ -139,15 +139,15 @@ func openLog() *os.File {
 
 func main() {
 	logF = openLog()
-	defer logF.Close()	
+	defer logF.Close()
 
 	log.SetOutput(logF)
-	
-	infoLog  = log.New(logF, "INFO: ", log.Ldate|log.Ltime)
+
+	infoLog = log.New(logF, "INFO: ", log.Ldate|log.Ltime)
 	errorLog = log.New(logF, "ERROR: ", log.Ldate|log.Ltime)
 
-	infoLog.Println("log opened")	
-	
+	infoLog.Println("log opened")
+
 	_, err := toml.DecodeFile("config.toml", &conf)
 	if os.IsNotExist(err) {
 		if err = createConfig(); err != nil {
@@ -189,7 +189,7 @@ func ready(s *discordgo.Session, m *discordgo.Ready) {
 	fmt.Printf("Log-in successful! Log-in time: %.2f\n", time.Since(loginTime).Seconds())
 	fmt.Printf("Joined %d guilds\n", len(m.Guilds))
 	fmt.Println("Type Ctrl+C to quit 2Bot2Go")
-	
+
 	infoLog.Printf("Log-in successful! Log-in time: %.2f\n", time.Since(loginTime).Seconds())
 	infoLog.Printf("Joined %d guilds\n", len(m.Guilds))
 }

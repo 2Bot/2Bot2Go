@@ -103,15 +103,21 @@ func msgFindEmoji(s *discordgo.Session, m *discordgo.MessageCreate, msglist []st
 		}()},
 	}
 
+	userColor := s.State.UserColor(s.State.User.ID, m.ChannelID)
+
 	if len(emojis) == 0 {
 		s.ChannelMessageSendEmbed(m.ChannelID, &discordgo.MessageEmbed{
 			Title: "No emojis found!",
+
+			Color: userColor,
 		})
 		return
 	}
 
 	_, err := s.ChannelMessageSendEmbed(m.ChannelID, &discordgo.MessageEmbed{
-		Title: "Emojis with the name " + emojiName,
+		Title: "Emojis with the substring `" + emojiName + "`",
+
+		Color: userColor,
 
 		Fields: emojisEmbed,
 	})
