@@ -25,6 +25,9 @@ var (
 	conf       = &config{}
 	emojiRegex = regexp.MustCompile("<:(.*?):(.*?)>")
 	loginTime  time.Time
+	errorLog   *log.Logger
+	infoLog    *log.Logger
+	logF       *os.File
 )
 
 func createConfig() error {
@@ -55,11 +58,9 @@ func createConfig() error {
 }
 
 func inputToken() error {
-	fmt.Println("\nFirst, I'll need your user token. To do that, follow these instructions:")
-	fmt.Println("1. Type Ctrl-Shift-i\n2. Click on the tab labelled 'Application'\n3. Click 'Local Storage', and then https://discordapp.com")
-	fmt.Println("4. Then copy paste the long string of random characters here, but WITHOUT THE QUOTATION MARKS! Thats very important")
+	fmt.Println("\nFirst, I'll need your user token. To do that, follow these instructions:\n1. Type Ctrl-Shift-i\n2. Click on the tab labelled 'Application'\n3. Click 'Local Storage', and then https://discordapp.com")
+	fmt.Print("4. Then copy paste the long string of random characters here, but WITHOUT THE QUOTATION MARKS! Thats very important\nPaste your token here: ")
 
-	fmt.Print("\nPaste your token here: ")
 	fmt.Scanln(&conf.Token)
 	err := testLogin()
 	if err != nil {
@@ -71,13 +72,14 @@ func inputToken() error {
 }
 
 func inputPrefix() {
-	fmt.Println("\nNext up, I'll need a prefix of your preference! This will be used to call your commands.")
+	fmt.Println("\nNext up, I'll need a prefix of your preference! This will be used to call your commands.\nYou can choose to have a space between your prefix and command after you input your prefix")
 	fmt.Println("Example: prefix => ||\n||help => shows the help menu")
 	fmt.Print("\nType your chosen prefix here: ")
+
 	fmt.Scanln(&conf.Prefix)
-	fmt.Print("Do you want a space at the end of your prefix? (y/n) ")
 	var ws string
 	for {
+		fmt.Print("Do you want a space at the end of your prefix? (y/n) ")		
 		fmt.Scanln(&ws)
 		switch strings.ToLower(ws) {
 		case "y":
@@ -86,14 +88,14 @@ func inputPrefix() {
 		case "n":
 			return
 		default:
-			fmt.Println("Please type y or n")
+			fmt.Println("\nPlease type y or n")
 		}
 	}
-
 }
 
 func testLogin() error {
-	fmt.Println("Trying to login... ")
+	fmt.Println("Trying to login...")
+	infoLog.Println("Trying to login...")
 
 	var err error
 	dg, err = discordgo.New(conf.Token)
@@ -107,6 +109,8 @@ func testLogin() error {
 	}
 
 	fmt.Println("\rToken is valid!")
+	infoLog.Println("\rToken is valid!")	
+	
 	return nil
 }
 
@@ -124,28 +128,50 @@ func loadConfig() error {
 	return nil
 }
 
-func main() {
+func openLog() *os.File {
+	f, err := os.OpenFile("log.txt", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(2)
+	}
+	return f
+}
 
+func main() {
+	logF = openLog()
+	defer logF.Close()	
+
+	log.SetOutput(logF)
+	
+	infoLog  = log.New(logF, "INFO: ", log.Ldate|log.Ltime)
+	errorLog = log.New(logF, "ERROR: ", log.Ldate|log.Ltime)
+
+	infoLog.Println("log opened")	
+	
 	_, err := toml.DecodeFile("config.toml", &conf)
 	if os.IsNotExist(err) {
 		if err = createConfig(); err != nil {
-			log.Fatalln(err)
+			fmt.Println(err)
+			errorLog.Fatalln(err)
 		}
 	} else {
 		if err = loadConfig(); err != nil || conf.Prefix == "" || conf.Token == "" {
-			log.Fatalln(err)
+			fmt.Println(err)
+			errorLog.Fatalln(err)
 		}
 	}
 
 	if dg == nil {
 		if err = testLogin(); err != nil {
-			log.Fatalln(err)
+			fmt.Println(err)
+			errorLog.Fatalln(err)
 		}
 	}
 
 	loginTime = time.Now()
 	if err = dg.Open(); err != nil {
-		log.Fatalln(err)
+		fmt.Println(err)
+		errorLog.Fatalln(err)
 	}
 
 	dg.AddHandlerOnce(ready)
@@ -162,6 +188,10 @@ func main() {
 func ready(s *discordgo.Session, m *discordgo.Ready) {
 	fmt.Printf("Log-in successful! Log-in time: %.2f\n", time.Since(loginTime).Seconds())
 	fmt.Printf("Joined %d guilds\n", len(m.Guilds))
+	fmt.Println("Type Ctrl+C to quit 2Bot2Go")
+	
+	infoLog.Printf("Log-in successful! Log-in time: %.2f\n", time.Since(loginTime).Seconds())
+	infoLog.Printf("Joined %d guilds\n", len(m.Guilds))
 }
 
 func message(s *discordgo.Session, m *discordgo.MessageCreate) {

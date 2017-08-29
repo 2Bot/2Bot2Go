@@ -31,37 +31,33 @@ func emojiFile(s string) string {
 
 func msgEmoji(s *discordgo.Session, m *discordgo.MessageCreate, msglist []string) {
 	submatch := emojiRegex.FindStringSubmatch(msglist[0])
-	fmt.Println(submatch)
+
 	if len(submatch) == 3 {
 		emojiID := submatch[2]
 
 		resp, err := http.Get(fmt.Sprintf("https://cdn.discordapp.com/emojis/%s.png", emojiID))
 		if err != nil {
-			fmt.Println("Custom emoji err:", err.Error())
+			errorLog.Println("Custom emoji err:", err.Error())
 			return
 		}
 		defer resp.Body.Close()
 
 		s.ChannelFileSend(m.ChannelID, "emoji.png", resp.Body)
 
-		if m != nil {
-			s.ChannelMessageDelete(m.ChannelID, m.ID)
-		}
+		s.ChannelMessageDelete(m.ChannelID, m.ID)
 	} else {
 		emoji := emojiFile(msglist[0])
 		if emoji != "" {
 			file, err := os.Open(fmt.Sprintf("emoji/%s.png", emoji))
 			if err != nil {
-				fmt.Println("Twemoji emoji err:", err.Error())
+				errorLog.Println("Twemoji emoji err:", err.Error())
 				return
 			}
 			defer file.Close()
 
 			s.ChannelFileSend(m.ChannelID, "emoji.png", file)
 
-			if m != nil {
-				s.ChannelMessageDelete(m.ChannelID, m.ID)
-			}
+			s.ChannelMessageDelete(m.ChannelID, m.ID)
 		}
 	}
 	return
@@ -120,6 +116,8 @@ func msgFindEmoji(s *discordgo.Session, m *discordgo.MessageCreate, msglist []st
 		Fields: emojisEmbed,
 	})
 	if err != nil {
-		fmt.Println(err)
+		errorLog.Println(err)
 	}
+
+	s.ChannelMessageDelete(m.ChannelID, m.Message.ID)
 }
