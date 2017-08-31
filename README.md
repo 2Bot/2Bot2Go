@@ -1,5 +1,5 @@
 # 2Bot2Go
-
+[![Go Report Card](https://goreportcard.com/badge/github.com/Strum355/2Bot2Go)](https://goreportcard.com/report/github.com/Strum355/2Bot2Go)
 [![Github All Releases](https://img.shields.io/github/downloads/Strum355/2Bot2Go/total.svg)]()
 [![Website](https://img.shields.io/badge/discord-2Bot%20Server-blue.svg)](https://discord.gg/9T34Y6u)
 
