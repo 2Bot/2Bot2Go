@@ -32,6 +32,20 @@ var (
 		Help: "Args: [emoji | name]\n\nReturns all the emojis that match the given emoji or emoji name in all the servers you are in",
 		Exec: msgFindEmoji,
 	}.add()
+	imageCommand = command{
+		Name: "image",
+		Help: "Args: [save,recall,delete,list,status] [name]\n\nSave images and recall them at anytime! Everyone gets 8MB of image storage. Any name counts so long theres no `/` in it." +
+		"Only you can 'recall' your saved images. There's a review process to make sure nothing illegal is being uploaded but we're fairly relaxed for the most part\n\n" +
+		"Example:\n`!owo image save 2B Happy`\n2Bot downloads the image and sends it off for reviewing\n\n" +
+		"`!owo image recall 2B Happy`\nIf your image was confirmed, 2Bot will send the image named `2B Happy`\n\n" +
+		"`!owo image delete 2B Happy`\nThis will delete the image you saved called `2B Happy`\n\n" +
+		"`!owo image list`\nThis will list your saved images along with a preview!\n\n" +
+		"`!owo image status`\nShows some details on your saved images and quota",
+		Exec: msgImageRecall,
+	}.add()
+	helpComm = command{"help",
+		"", msgHelp,
+		}.add()
 )
 
 //Small wrapper function to reduce clutter
@@ -47,19 +61,6 @@ func parseCommand(s *discordgo.Session, m *discordgo.MessageCreate, message stri
 		}
 		return msglist[0]
 	}()
-
-	if command == "help" {
-		if len(msglist) == 2 {
-			if val, ok := commMap[l(msglist[1])]; ok {
-				val.helpCommand(s, m)
-				return
-			}
-		}
-
-		listCommands(s, m)
-
-		return
-	}
 
 	if command == l(commMap[command].Name) {
 		commMap[command].Exec(s, m, msglist[1:])
@@ -95,7 +96,11 @@ func listCommands(s *discordgo.Session, m *discordgo.MessageCreate) {
 	})
 }
 
-func (c command) helpCommand(s *discordgo.Session, m *discordgo.MessageCreate) {
+func (c command) msgHelp(s *discordgo.Session, m *discordgo.MessageCreate, msglist []string) {
+	if len(msglist) == 0 {
+		listCommands(s, m)
+		return
+	}
 	userColor := s.State.UserColor(s.State.User.ID, m.ChannelID)
 
 	s.ChannelMessageDelete(m.ChannelID, m.Message.ID)
