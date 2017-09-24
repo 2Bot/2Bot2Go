@@ -29,28 +29,21 @@ func msgImageRecall(s *discordgo.Session, m *discordgo.MessageCreate, msglist []
 }
 
 func fimageRecall(s *discordgo.Session, m *discordgo.MessageCreate, msglist []string) {
-	resp, err := http.Get("http://strum355.netsoc.co/inServer?id="+m.Author.ID)
+}
+
+func fimageSave(s *discordgo.Session, m *discordgo.MessageCreate, msglist []string) {
+	resp, err := http.Get("http://strum355.netsoc.co:8042/inServer?id="+m.Author.ID)
 	if err != nil {
 		errorLog.Println(err)
 		return
 	}
 	defer resp.Body.Close()
 
-	bytes, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		errorLog.Println(err)
+	exists := resp.Header.Get("exists")
+	if exists == "false" {
+		errorLog.Println("Gotta be in the 2Bot server for this command")
 		return
 	}
-
-	if string(bytes) == "1" {
-		fmt.Println("in server")
-		return
-	}
-	fmt.Println("not in server")
-}
-
-func fimageSave(s *discordgo.Session, m *discordgo.MessageCreate, msglist []string) {
-	
 }
 
 func fimageList(s *discordgo.Session, m *discordgo.MessageCreate, msglist []string) {
