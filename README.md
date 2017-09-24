@@ -13,6 +13,8 @@ Using 2Bot2Go is a very simple process.
 
 Be aware that the program has to be running for 2Bot2Go to work, so closing it will also kill 2Bot2Go :( Follow your OS's instructions on how to run it in the background and/or start it on startup if you so wish.
 
+For best results join the [Discord server](https://discord.gg/9T34Y6u) to avail of all 2Bot2Go's features!
+
 #### Extra info
 For the large-emoji command, download the discord built-in emoji [here](https://noahsc.xyz/2Bot/emoji.zip) to be able to use the command with the discord built-in emoji too. Extract the zip to the same folder as where the 2Bot2Go executable file is
 
