@@ -28,6 +28,8 @@ var (
 	errorLog   *log.Logger
 	infoLog    *log.Logger
 	logF       *os.File
+	// Zero width whitespace to replace message content
+	content    = "​"
 )
 
 func createConfig() error {
@@ -173,6 +175,9 @@ func main() {
 		fmt.Println(err)
 		errorLog.Fatalln(err)
 	}
+	defer dg.Close()
+
+	prepareCommands()
 
 	dg.AddHandlerOnce(ready)
 	dg.AddHandler(message)
@@ -180,9 +185,6 @@ func main() {
 	sc := make(chan os.Signal, 1)
 	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt, os.Kill)
 	<-sc
-
-	// Cleanly close down the Discord session.
-	dg.Close()
 }
 
 func ready(s *discordgo.Session, m *discordgo.Ready) {

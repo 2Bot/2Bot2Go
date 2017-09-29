@@ -43,7 +43,6 @@ func msgEmoji(s *discordgo.Session, m *discordgo.MessageCreate, msglist []string
 		defer resp.Body.Close()
 
 		s.ChannelFileSend(m.ChannelID, "emoji.png", resp.Body)
-
 		s.ChannelMessageDelete(m.ChannelID, m.ID)
 	} else {
 		emoji := emojiFile(msglist[0])
@@ -65,6 +64,7 @@ func msgEmoji(s *discordgo.Session, m *discordgo.MessageCreate, msglist []string
 
 func msgFindEmoji(s *discordgo.Session, m *discordgo.MessageCreate, msglist []string) {
 	var emojiName string
+	content := "​"
 	submatch := emojiRegex.FindStringSubmatch(strings.Join(msglist, " "))
 
 	if len(submatch) < 2 {
@@ -104,26 +104,29 @@ func msgFindEmoji(s *discordgo.Session, m *discordgo.MessageCreate, msglist []st
 	}
 
 	userColor := s.State.UserColor(s.State.User.ID, m.ChannelID)
-
+	
 	if len(emojis) == 0 {
-		s.ChannelMessageSendEmbed(m.ChannelID, &discordgo.MessageEmbed{
-			Title: "No emojis found!",
+		edit := newEdit(s, m, userColor)
+		edit.setTitle("No emojis found!")
+		edit.send()
 
-			Color: userColor,
-		})
 		return
 	}
 
-	_, err := s.ChannelMessageSendEmbed(m.ChannelID, &discordgo.MessageEmbed{
-		Title: "Emojis with the substring `" + emojiName + "`",
+	_, err := s.ChannelMessageEditComplex(&discordgo.MessageEdit{
+		ID: m.Message.ID,
+		Channel: m.ChannelID,
+		Content: &content,		
+		Embed: &discordgo.MessageEmbed{
+			Title: "Emojis with the substring `" + emojiName + "`",
 
-		Color: userColor,
+			Color: userColor,
 
-		Fields: emojisEmbed,
+			Fields: emojisEmbed,
+		},
 	})
 	if err != nil {
 		errorLog.Println(err)
 	}
 
-	s.ChannelMessageDelete(m.ChannelID, m.Message.ID)
 }
