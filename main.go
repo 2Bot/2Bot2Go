@@ -29,7 +29,7 @@ var (
 	infoLog    *log.Logger
 	logF       *os.File
 	// Zero width whitespace to replace message content
-	content    = "​"
+	content = "​"
 )
 
 func createConfig() error {

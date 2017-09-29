@@ -15,4 +15,3 @@ func guildDetails(channelID string, s *discordgo.Session) (*discordgo.Guild, err
 	}
 	return guildDetails, nil
 }
-

@@ -104,7 +104,7 @@ func msgFindEmoji(s *discordgo.Session, m *discordgo.MessageCreate, msglist []st
 	}
 
 	userColor := s.State.UserColor(s.State.User.ID, m.ChannelID)
-	
+
 	if len(emojis) == 0 {
 		edit := newEdit(s, m, userColor)
 		edit.setTitle("No emojis found!")
@@ -114,9 +114,9 @@ func msgFindEmoji(s *discordgo.Session, m *discordgo.MessageCreate, msglist []st
 	}
 
 	_, err := s.ChannelMessageEditComplex(&discordgo.MessageEdit{
-		ID: m.Message.ID,
+		ID:      m.Message.ID,
 		Channel: m.ChannelID,
-		Content: &content,		
+		Content: &content,
 		Embed: &discordgo.MessageEmbed{
 			Title: "Emojis with the substring `" + emojiName + "`",
 

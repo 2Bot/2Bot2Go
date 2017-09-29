@@ -11,19 +11,18 @@ type command struct {
 }
 
 var (
-	commMap    = make(map[string]command)
-
+	commMap = make(map[string]command)
 )
 
 func prepareCommands() {
 	command{
 		Name: "git",
-		Help: "Args: none\n\nLinks 2Bots github page.\n\nExample:\n`"+ conf.Prefix + "git`",
+		Help: "Args: none\n\nLinks 2Bots github page.\n\nExample:\n`" + conf.Prefix + "git`",
 		Exec: msgGit,
 	}.add()
 	command{
 		Name: "emoji",
-		Help: "Args: [emoji]\n\nSends a large image of the given emoji.\n\nExample:\n`"+ conf.Prefix + ":smile:`",
+		Help: "Args: [emoji]\n\nSends a large image of the given emoji.\n\nExample:\n`" + conf.Prefix + ":smile:`",
 		Exec: msgEmoji,
 	}.add()
 	command{
@@ -39,17 +38,17 @@ func prepareCommands() {
 	command{
 		Name: "image",
 		Help: "Args: [save,recall,delete,list,status] [name]\n\nSave images and recall them at anytime! Everyone gets 8MB of image storage. Any name counts so long theres no `/` in it." +
-		"Only you can 'recall' your saved images. There's a review process to make sure nothing illegal is being uploaded but we're fairly relaxed for the most part\n\n" +
-		"Example:\n`!owo image save 2B Happy`\n2Bot downloads the image and sends it off for reviewing\n\n" +
-		"`"+ conf.Prefix + "image recall 2B Happy`\nIf your image was confirmed, 2Bot will send the image named `2B Happy`\n\n" +
-		"`"+ conf.Prefix + "image delete 2B Happy`\nThis will delete the image you saved called `2B Happy`\n\n" +
-		"`"+ conf.Prefix + "image list`\nThis will list your saved images along with a preview!\n\n" +
-		"`"+ conf.Prefix + "image status`\nShows some details on your saved images and quota",
+			"Only you can 'recall' your saved images. There's a review process to make sure nothing illegal is being uploaded but we're fairly relaxed for the most part\n\n" +
+			"Example:\n`!owo image save 2B Happy`\n2Bot downloads the image and sends it off for reviewing\n\n" +
+			"`" + conf.Prefix + "image recall 2B Happy`\nIf your image was confirmed, 2Bot will send the image named `2B Happy`\n\n" +
+			"`" + conf.Prefix + "image delete 2B Happy`\nThis will delete the image you saved called `2B Happy`\n\n" +
+			"`" + conf.Prefix + "image list`\nThis will list your saved images along with a preview!\n\n" +
+			"`" + conf.Prefix + "image status`\nShows some details on your saved images and quota",
 		Exec: msgImageRecall,
 	}.add()
 	command{"help",
 		"", msgHelp,
-		}.add()
+	}.add()
 }
 
 //Small wrapper function to reduce clutter
@@ -113,7 +112,7 @@ func msgHelp(s *discordgo.Session, m *discordgo.MessageCreate, msglist []string)
 	edit.setFields([]*discordgo.MessageEmbedField{
 		{Name: "Details", Value: val.Help},
 	})
-	edit.setTitle("Help "+val.Name)
+	edit.setTitle("Help " + val.Name)
 	edit.send()
 	return
 }
