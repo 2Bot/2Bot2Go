@@ -44,27 +44,26 @@ func msgEmoji(s *discordgo.Session, m *discordgo.MessageCreate, msglist []string
 
 		s.ChannelFileSend(m.ChannelID, "emoji.png", resp.Body)
 		s.ChannelMessageDelete(m.ChannelID, m.ID)
-	} else {
-		emoji := emojiFile(msglist[0])
-		if emoji != "" {
-			file, err := os.Open(fmt.Sprintf("emoji/%s.png", emoji))
-			if err != nil {
-				errorLog.Println("Twemoji emoji err:", err.Error())
-				return
-			}
-			defer file.Close()
-
-			s.ChannelFileSend(m.ChannelID, "emoji.png", file)
-
-			s.ChannelMessageDelete(m.ChannelID, m.ID)
-		}
+		return
 	}
-	return
+	
+	emoji := emojiFile(msglist[0])
+	if emoji != "" {
+		file, err := os.Open(fmt.Sprintf("emoji/%s.png", emoji))
+		if err != nil {
+			errorLog.Println("Twemoji emoji err:", err.Error())
+			return
+		}
+		defer file.Close()
+
+		s.ChannelFileSend(m.ChannelID, "emoji.png", file)
+
+		s.ChannelMessageDelete(m.ChannelID, m.ID)
+	}
 }
 
 func msgFindEmoji(s *discordgo.Session, m *discordgo.MessageCreate, msglist []string) {
 	var emojiName string
-	content := "​"
 	submatch := emojiRegex.FindStringSubmatch(strings.Join(msglist, " "))
 
 	if len(submatch) < 2 {
@@ -76,7 +75,7 @@ func msgFindEmoji(s *discordgo.Session, m *discordgo.MessageCreate, msglist []st
 	emojis := []string{}
 	lenEmojiNames := 0
 	lenEmoji := 0
-	done := false
+	done 	 := false
 	for _, guild := range s.State.Guilds {
 		for _, emoji := range guild.Emojis {
 			if strings.Contains(strings.ToLower(emoji.Name), strings.ToLower(emojiName)) {
