@@ -65,6 +65,10 @@ func parseCommand(s *discordgo.Session, m *discordgo.MessageCreate, message stri
 		return msglist[0]
 	}()
 
+	if command == "emoji" {
+		return
+	}
+
 	if command == l(commMap[command].Name) {
 		commMap[command].Exec(s, m, msglist[1:])
 		return
