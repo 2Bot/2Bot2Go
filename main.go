@@ -34,8 +34,7 @@ func createConfig() error {
 	fmt.Println("Welcome and thanks for downloading 2Bot2Go!")
 	fmt.Println("As I couldn't find a file called config.toml, I'll assume this is your first time starting the bot, so lets get it setup!")
 
-	err := inputToken()
-	if err != nil {
+	if err := inputToken(); err != nil {
 		return err
 	}
 
@@ -62,8 +61,7 @@ func inputToken() error {
 	fmt.Print("4. Then copy paste the long string of random characters here, but WITHOUT THE QUOTATION MARKS! Thats very important\nPaste your token here: ")
 
 	fmt.Scanln(&conf.Token)
-	err := testLogin()
-	if err != nil {
+	if err := testLogin(); err != nil {	
 		fmt.Println("There was an issue logging you in. Check your token and try again")
 		return err
 	}
@@ -103,8 +101,7 @@ func testLogin() error {
 		return err
 	}
 
-	_, err = dg.User("@me")
-	if err != nil {
+	if _, err = dg.User("@me"); err != nil {
 		return err
 	}
 
@@ -120,8 +117,7 @@ func loadConfig() error {
 		return err
 	}
 
-	_, err = toml.Decode(string(bytes), conf)
-	if err != nil {
+	if _, err = toml.Decode(string(bytes), conf); err != nil {
 		return err
 	}
 
