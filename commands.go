@@ -11,42 +11,45 @@ type command struct {
 }
 
 var (
-	commMap    = make(map[string]command)
-	gitCommand = command{
+	commMap = make(map[string]command)
+)
+
+func prepareCommands() {
+	command{
 		Name: "git",
-		Help: "Args: none\n\nLinks 2Bots github page.\n\nExample:\n`!owo git`",
+		Help: "Args: none\n\nLinks 2Bots github page.\n\nExample:\n`" + conf.Prefix + "git`",
 		Exec: msgGit,
 	}.add()
-	emojiCommand = command{
-		Name: "",
-		Help: "Args: [emoji]\n\nSends a large image of the given emoji.\n\nExample:\n`!owo :smile:`",
+	command{
+		Name: "emoji",
+		Help: "Args: [emoji]\n\nSends a large image of the given emoji.\n\nExample:\n`" + conf.Prefix + ":smile:`",
 		Exec: msgEmoji,
 	}.add()
-	gameCommand = command{
+	command{
 		Name: "setGame",
 		Help: "Args: [game]\n\nSets your current game to 'game'",
 		Exec: msgGame,
 	}.add()
-	findEmojiCommand = command{
+	command{
 		Name: "findEmoji",
 		Help: "Args: [emoji | name]\n\nReturns all the emojis that match the given emoji or emoji name in all the servers you are in",
 		Exec: msgFindEmoji,
 	}.add()
-	imageCommand = command{
+	command{
 		Name: "image",
 		Help: "Args: [save,recall,delete,list,status] [name]\n\nSave images and recall them at anytime! Everyone gets 8MB of image storage. Any name counts so long theres no `/` in it." +
-		"Only you can 'recall' your saved images. There's a review process to make sure nothing illegal is being uploaded but we're fairly relaxed for the most part\n\n" +
-		"Example:\n`!owo image save 2B Happy`\n2Bot downloads the image and sends it off for reviewing\n\n" +
-		"`!owo image recall 2B Happy`\nIf your image was confirmed, 2Bot will send the image named `2B Happy`\n\n" +
-		"`!owo image delete 2B Happy`\nThis will delete the image you saved called `2B Happy`\n\n" +
-		"`!owo image list`\nThis will list your saved images along with a preview!\n\n" +
-		"`!owo image status`\nShows some details on your saved images and quota",
+			"Only you can 'recall' your saved images. There's a review process to make sure nothing illegal is being uploaded but we're fairly relaxed for the most part\n\n" +
+			"Example:\n`!owo image save 2B Happy`\n2Bot downloads the image and sends it off for reviewing\n\n" +
+			"`" + conf.Prefix + "image recall 2B Happy`\nIf your image was confirmed, 2Bot will send the image named `2B Happy`\n\n" +
+			"`" + conf.Prefix + "image delete 2B Happy`\nThis will delete the image you saved called `2B Happy`\n\n" +
+			"`" + conf.Prefix + "image list`\nThis will list your saved images along with a preview!\n\n" +
+			"`" + conf.Prefix + "image status`\nShows some details on your saved images and quota",
 		Exec: msgImageRecall,
 	}.add()
-	helpComm = command{"help",
+	command{"help",
 		"", msgHelp,
-		}.add()
-)
+	}.add()
+}
 
 //Small wrapper function to reduce clutter
 func l(s string) (r string) {
@@ -62,6 +65,10 @@ func parseCommand(s *discordgo.Session, m *discordgo.MessageCreate, message stri
 		return msglist[0]
 	}()
 
+	if command == "emoji" {
+		return
+	}
+
 	if command == l(commMap[command].Name) {
 		commMap[command].Exec(s, m, msglist[1:])
 		return
@@ -69,7 +76,7 @@ func parseCommand(s *discordgo.Session, m *discordgo.MessageCreate, message stri
 
 	//if data passed as command isnt a valid command,
 	//check if its an emoji
-	emojiCommand.Exec(s, m, msglist)
+	commMap["emoji"].Exec(s, m, msglist)
 }
 
 func listCommands(s *discordgo.Session, m *discordgo.MessageCreate) {
@@ -83,36 +90,34 @@ func listCommands(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 	userColor := s.State.UserColor(s.State.User.ID, m.ChannelID)
 
-	s.ChannelMessageDelete(m.ChannelID, m.Message.ID)
-	s.ChannelMessageSendEmbed(m.ChannelID, &discordgo.MessageEmbed{
-		Title: "Help",
-
-		Color: userColor,
-
-		Fields: []*discordgo.MessageEmbedField{
-			{Name: "List", Value: strings.Join(commands, ", ")},
-			{Name: "Info", Value: "\n\nUse `" + conf.Prefix + "help [command]` for detailed info about a command."},
-		},
+	edit := newEdit(s, m, userColor)
+	edit.setFields([]*discordgo.MessageEmbedField{
+		{Name: "List", Value: strings.Join(commands, ", ")},
+		{Name: "Info", Value: "\n\nUse `" + conf.Prefix + "help [command]` for detailed info about a command."},
 	})
+	edit.send()
 }
 
-func (c command) msgHelp(s *discordgo.Session, m *discordgo.MessageCreate, msglist []string) {
+func msgHelp(s *discordgo.Session, m *discordgo.MessageCreate, msglist []string) {
 	if len(msglist) == 0 {
 		listCommands(s, m)
 		return
 	}
+
+	command := msglist[0]
+	val, ok := commMap[command]
+	if !ok {
+		return
+	}
+
 	userColor := s.State.UserColor(s.State.User.ID, m.ChannelID)
 
-	s.ChannelMessageDelete(m.ChannelID, m.Message.ID)
-	s.ChannelMessageSendEmbed(m.ChannelID, &discordgo.MessageEmbed{
-		Title: "Help: " + c.Name,
-
-		Color: userColor,
-
-		Fields: []*discordgo.MessageEmbedField{
-			{Name: "Details", Value: c.Help},
-		},
+	edit := newEdit(s, m, userColor)
+	edit.setFields([]*discordgo.MessageEmbedField{
+		{Name: "Details", Value: val.Help},
 	})
+	edit.setTitle("Help " + val.Name)
+	edit.send()
 	return
 }
 

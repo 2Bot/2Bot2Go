@@ -43,24 +43,23 @@ func msgEmoji(s *discordgo.Session, m *discordgo.MessageCreate, msglist []string
 		defer resp.Body.Close()
 
 		s.ChannelFileSend(m.ChannelID, "emoji.png", resp.Body)
+		s.ChannelMessageDelete(m.ChannelID, m.ID)
+		return
+	}
+	
+	emoji := emojiFile(msglist[0])
+	if emoji != "" {
+		file, err := os.Open(fmt.Sprintf("emoji/%s.png", emoji))
+		if err != nil {
+			errorLog.Println("Twemoji emoji err:", err.Error())
+			return
+		}
+		defer file.Close()
+
+		s.ChannelFileSend(m.ChannelID, "emoji.png", file)
 
 		s.ChannelMessageDelete(m.ChannelID, m.ID)
-	} else {
-		emoji := emojiFile(msglist[0])
-		if emoji != "" {
-			file, err := os.Open(fmt.Sprintf("emoji/%s.png", emoji))
-			if err != nil {
-				errorLog.Println("Twemoji emoji err:", err.Error())
-				return
-			}
-			defer file.Close()
-
-			s.ChannelFileSend(m.ChannelID, "emoji.png", file)
-
-			s.ChannelMessageDelete(m.ChannelID, m.ID)
-		}
 	}
-	return
 }
 
 func msgFindEmoji(s *discordgo.Session, m *discordgo.MessageCreate, msglist []string) {
@@ -76,7 +75,7 @@ func msgFindEmoji(s *discordgo.Session, m *discordgo.MessageCreate, msglist []st
 	emojis := []string{}
 	lenEmojiNames := 0
 	lenEmoji := 0
-	done := false
+	done 	 := false
 	for _, guild := range s.State.Guilds {
 		for _, emoji := range guild.Emojis {
 			if strings.Contains(strings.ToLower(emoji.Name), strings.ToLower(emojiName)) {
@@ -106,24 +105,27 @@ func msgFindEmoji(s *discordgo.Session, m *discordgo.MessageCreate, msglist []st
 	userColor := s.State.UserColor(s.State.User.ID, m.ChannelID)
 
 	if len(emojis) == 0 {
-		s.ChannelMessageSendEmbed(m.ChannelID, &discordgo.MessageEmbed{
-			Title: "No emojis found!",
+		edit := newEdit(s, m, userColor)
+		edit.setTitle("No emojis found!")
+		edit.send()
 
-			Color: userColor,
-		})
 		return
 	}
 
-	_, err := s.ChannelMessageSendEmbed(m.ChannelID, &discordgo.MessageEmbed{
-		Title: "Emojis with the substring `" + emojiName + "`",
+	_, err := s.ChannelMessageEditComplex(&discordgo.MessageEdit{
+		ID:      m.Message.ID,
+		Channel: m.ChannelID,
+		Content: &content,
+		Embed: &discordgo.MessageEmbed{
+			Title: "Emojis with the substring `" + emojiName + "`",
 
-		Color: userColor,
+			Color: userColor,
 
-		Fields: emojisEmbed,
+			Fields: emojisEmbed,
+		},
 	})
 	if err != nil {
 		errorLog.Println(err)
 	}
 
-	s.ChannelMessageDelete(m.ChannelID, m.Message.ID)
 }
