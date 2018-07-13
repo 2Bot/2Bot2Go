@@ -11,8 +11,7 @@ func msgGit(s *discordgo.Session, m *discordgo.MessageCreate, _ []string) {
 }
 
 func msgGame(s *discordgo.Session, m *discordgo.MessageCreate, msglist []string) {
-	err := s.UpdateStatus(0, strings.Join(msglist, " "))
-	if err != nil {
+	if err := s.UpdateStatus(0, strings.Join(msglist, " ")); err != nil {
 		s.ChannelMessageEdit(m.ChannelID, m.Message.ID, "Error setting game")
 		return
 	}

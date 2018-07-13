@@ -63,7 +63,7 @@ func inputToken() error {
 	fmt.Print("4. Then copy paste the long string of random characters here, but WITHOUT THE QUOTATION MARKS! Thats very important\nPaste your token here: ")
 
 	fmt.Scanln(&conf.Token)
-	if err := testLogin(); err != nil {	
+	if err := testLogin(); err != nil {
 		fmt.Println("There was an issue logging you in. Check your token and try again")
 		return err
 	}
@@ -146,8 +146,7 @@ func main() {
 
 	infoLog.Println("log opened")
 
-	_, err := toml.DecodeFile("config.toml", &conf)
-	if os.IsNotExist(err) {
+	if _, err := toml.DecodeFile("config.toml", &conf); os.IsNotExist(err) {
 		if err = createConfig(); err != nil {
 			fmt.Println(err)
 			errorLog.Fatalln(err)
@@ -157,20 +156,20 @@ func main() {
 			fmt.Println(err)
 			errorLog.Fatalln(err)
 		}
-	} 
+	}
 
-	fmt.Println("Prefix is "+conf.Prefix)
-	infoLog.Println("Prefix is "+conf.Prefix)
+	fmt.Println("Prefix is " + conf.Prefix)
+	infoLog.Println("Prefix is " + conf.Prefix)
 
 	if dg == nil {
-		if err = testLogin(); err != nil {
+		if err := testLogin(); err != nil {
 			fmt.Println(err)
 			errorLog.Fatalln(err)
 		}
 	}
 
 	loginTime = time.Now()
-	if err = dg.Open(); err != nil {
+	if err := dg.Open(); err != nil {
 		fmt.Println(err)
 		errorLog.Fatalln(err)
 	}

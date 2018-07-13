@@ -11,8 +11,8 @@ import (
 
 //Thanks to iopred
 func emojiFile(s string) string {
-	found := ""
-	filename := ""
+	var found string
+	var filename string
 	for _, r := range s {
 		if filename != "" {
 			filename = fmt.Sprintf("%s-%x", filename, r)
@@ -46,7 +46,7 @@ func msgEmoji(s *discordgo.Session, m *discordgo.MessageCreate, msglist []string
 		s.ChannelMessageDelete(m.ChannelID, m.ID)
 		return
 	}
-	
+
 	emoji := emojiFile(msglist[0])
 	if emoji != "" {
 		file, err := os.Open(fmt.Sprintf("emoji/%s.png", emoji))
@@ -72,10 +72,10 @@ func msgFindEmoji(s *discordgo.Session, m *discordgo.MessageCreate, msglist []st
 		emojiName = submatch[1]
 	}
 
-	emojis := []string{}
-	lenEmojiNames := 0
-	lenEmoji := 0
-	done 	 := false
+	var emojis []string
+	var lenEmojiNames int
+	var lenEmoji int
+	var done bool
 	for _, guild := range s.State.Guilds {
 		for _, emoji := range guild.Emojis {
 			if strings.Contains(strings.ToLower(emoji.Name), strings.ToLower(emojiName)) {
@@ -108,7 +108,6 @@ func msgFindEmoji(s *discordgo.Session, m *discordgo.MessageCreate, msglist []st
 		edit := newEdit(s, m, userColor)
 		edit.setTitle("No emojis found!")
 		edit.send()
-
 		return
 	}
 
@@ -127,5 +126,4 @@ func msgFindEmoji(s *discordgo.Session, m *discordgo.MessageCreate, msglist []st
 	if err != nil {
 		errorLog.Println(err)
 	}
-
 }

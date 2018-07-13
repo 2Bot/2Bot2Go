@@ -4,11 +4,14 @@ import (
 	"bytes"
 	"encoding/hex"
 	"fmt"
-	"github.com/bwmarrin/discordgo"
-	"golang.org/x/crypto/blake2b"
 	"net/http"
 	"strings"
+
+	"github.com/bwmarrin/discordgo"
+	"golang.org/x/crypto/blake2b"
 )
+
+const apiURL = "https://api.2bot.ovh"
 
 func msgImageRecall(s *discordgo.Session, m *discordgo.MessageCreate, msglist []string) {
 	if len(msglist) < 1 {
@@ -36,7 +39,7 @@ func fimageRecall(s *discordgo.Session, m *discordgo.MessageCreate, msglist []st
 	hash := blake2b.Sum256([]byte(prefixedImgName))
 	imgFileName := hex.EncodeToString(hash[:])
 
-	URL := fmt.Sprintf("https://api.2bot.ml/image/%s/recall/%s", m.Author.ID, imgFileName)
+	URL := fmt.Sprintf(apiURL+"/image/%s/recall/%s", m.Author.ID, imgFileName)
 	resp, err := http.Get(URL)
 	if err != nil {
 		errorLog.Println(err)
@@ -49,8 +52,11 @@ func fimageRecall(s *discordgo.Session, m *discordgo.MessageCreate, msglist []st
 		return
 	}
 
-	buf := new(bytes.Buffer)
-	buf.ReadFrom(resp.Body)
+	var buf bytes.Buffer
+	if _, err := buf.ReadFrom(resp.Body); err != nil {
+		errorLog.Println("error reading image response", err)
+		return
+	}
 	imgURL := buf.String()
 
 	edit := newEdit(s, m, s.State.UserColor(s.State.User.ID, m.ChannelID))
@@ -60,7 +66,7 @@ func fimageRecall(s *discordgo.Session, m *discordgo.MessageCreate, msglist []st
 }
 
 func fimageSave(s *discordgo.Session, m *discordgo.MessageCreate, msglist []string) {
-	resp, err := http.Get("https://api.2bot.ml/inServer?id=" + m.Author.ID)
+	resp, err := http.Get(apiURL + "/inServer?id=" + m.Author.ID)
 	if err != nil {
 		errorLog.Println(err)
 		return

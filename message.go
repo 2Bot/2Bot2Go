@@ -5,7 +5,7 @@ import (
 )
 
 type editComplex struct {
-	Content *string
+	Content string
 	Embed   *discordgo.MessageEmbed
 
 	MessageCreate *discordgo.MessageCreate
@@ -14,7 +14,7 @@ type editComplex struct {
 
 func newEdit(s *discordgo.Session, m *discordgo.MessageCreate, color int) *editComplex {
 	return &editComplex{
-		Content: &content,
+		Content: content,
 
 		MessageCreate: m,
 		Session:       s,
@@ -48,7 +48,7 @@ func (e *editComplex) send() *discordgo.Message {
 		Channel: e.MessageCreate.ChannelID,
 		ID:      e.MessageCreate.Message.ID,
 
-		Content: &content,
+		Content: &e.Content,
 
 		Embed: &discordgo.MessageEmbed{
 			Color:       e.Embed.Color,
