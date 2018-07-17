@@ -6,3 +6,17 @@ INFO: 2018/07/17 17:42:27 log opened
 INFO: 2018/07/17 17:42:27 Prefix is || 
 INFO: 2018/07/17 17:42:27 Trying to login...
 INFO: 2018/07/17 17:42:27 Token is valid!
+INFO: 2018/07/17 17:50:14 log opened
+INFO: 2018/07/17 17:50:14 Prefix is || 
+INFO: 2018/07/17 17:50:14 Trying to login...
+INFO: 2018/07/17 17:50:15 Token is valid!
+ERROR: 2018/07/17 17:50:21 websocket: close 4000: Unknown error.
+INFO: 2018/07/17 17:50:31 log opened
+INFO: 2018/07/17 17:50:31 Prefix is || 
+INFO: 2018/07/17 17:50:31 Trying to login...
+INFO: 2018/07/17 17:50:31 Token is valid!
+INFO: 2018/07/17 17:51:23 log opened
+INFO: 2018/07/17 17:51:23 Prefix is || 
+INFO: 2018/07/17 17:51:23 Trying to login...
+INFO: 2018/07/17 17:51:23 Token is valid!
+ERROR: 2018/07/17 17:51:26 websocket: close 1000 (normal)
