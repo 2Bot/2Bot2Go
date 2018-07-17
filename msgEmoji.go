@@ -31,18 +31,25 @@ func emojiFile(s string) string {
 
 func msgEmoji(s *discordgo.Session, m *discordgo.MessageCreate, msglist []string) {
 	submatch := emojiRegex.FindStringSubmatch(msglist[0])
-
+	var url string
+	var filename string
 	if len(submatch) == 3 {
-		emojiID := submatch[2]
-
-		resp, err := http.Get(fmt.Sprintf("https://cdn.discordapp.com/emojis/%s.png", emojiID))
+		switch submatch[1] {
+		case "":
+			url = fmt.Sprintf("https://cdn.discordapp.com/emojis/%s.png", submatch[2])
+			filename += "emoji.png"
+		case "a":
+			url = fmt.Sprintf("https://cdn.discordapp.com/emojis/%s.gif", submatch[2])
+			filename += "emoji.gif"
+		}
+		resp, err := http.Get(url)
 		if err != nil {
 			errorLog.Println("Custom emoji err:", err.Error())
 			return
 		}
 		defer resp.Body.Close()
 
-		s.ChannelFileSend(m.ChannelID, "emoji.png", resp.Body)
+		s.ChannelFileSend(m.ChannelID, filename, resp.Body)
 		s.ChannelMessageDelete(m.ChannelID, m.ID)
 		return
 	}
