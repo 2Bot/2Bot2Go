@@ -23,7 +23,7 @@ type config struct {
 var (
 	dg         *discordgo.Session
 	conf       = &config{}
-	emojiRegex = regexp.MustCompile("<:(.*?):(.*?)>")
+	emojiRegex = regexp.MustCompile("<(a)?:.*?:(.*?)>")
 	loginTime  time.Time
 	errorLog   *log.Logger
 	infoLog    *log.Logger

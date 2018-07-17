@@ -1,0 +1,8 @@
+INFO: 2018/07/17 17:38:27 log opened
+INFO: 2018/07/17 17:39:20 Trying to login...
+INFO: 2018/07/17 17:39:20 Token is valid!
+INFO: 2018/07/17 17:39:30 Prefix is || 
+INFO: 2018/07/17 17:42:27 log opened
+INFO: 2018/07/17 17:42:27 Prefix is || 
+INFO: 2018/07/17 17:42:27 Trying to login...
+INFO: 2018/07/17 17:42:27 Token is valid!
