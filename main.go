@@ -1,8 +1,8 @@
 package main
 
 import (
+	"flag"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"os"
 	"os/signal"
@@ -21,16 +21,22 @@ type config struct {
 }
 
 var (
-	dg         *discordgo.Session
-	conf       = &config{}
+	// Zero width whitespace to replace message content
+	content    = "​"
+	conf       = new(config)
 	emojiRegex = regexp.MustCompile("<(a)?:.*?:(.*?)>")
 	loginTime  time.Time
+	dg         *discordgo.Session
 	errorLog   *log.Logger
 	infoLog    *log.Logger
 	logF       *os.File
-	// Zero width whitespace to replace message content
-	content = "​"
+	is2Cloud   *bool
 )
+
+func init() {
+	is2Cloud = flag.Bool("cloud", false, "if set, the program will exit if no config is found or is invalid")
+	flag.Parse()
+}
 
 func createConfig() error {
 	fmt.Println("Welcome and thanks for downloading 2Bot2Go!")
@@ -114,15 +120,9 @@ func testLogin() error {
 }
 
 func loadConfig() error {
-	bytes, err := ioutil.ReadFile("config.toml")
-	if err != nil {
+	if _, err := toml.DecodeFile("config.toml", conf); err != nil {
 		return err
 	}
-
-	if _, err = toml.Decode(string(bytes), conf); err != nil {
-		return err
-	}
-
 	return nil
 }
 
@@ -146,16 +146,26 @@ func main() {
 
 	infoLog.Println("log opened")
 
-	if _, err := toml.DecodeFile("config.toml", &conf); os.IsNotExist(err) {
-		if err = createConfig(); err != nil {
-			fmt.Println(err)
-			errorLog.Fatalln(err)
+	err := loadConfig()
+	switch {
+	case os.IsNotExist(err):
+		if !*is2Cloud {
+			if err = createConfig(); err != nil {
+				fmt.Println(err)
+				errorLog.Fatalln(err)
+			}
+		} else {
+			fmt.Println("config doesnt exist")
+			errorLog.Fatalln("config doesnt exist")
 		}
-	} else {
-		if err = loadConfig(); err != nil || conf.Prefix == "" || conf.Token == "" {
-			fmt.Println(err)
-			errorLog.Fatalln(err)
-		}
+	case err != nil:
+		fmt.Println(err)
+		errorLog.Fatalln(err)
+	}
+
+	if conf.Prefix == "" || conf.Token == "" {
+		fmt.Println("bad config")
+		errorLog.Fatalln("bad config")
 	}
 
 	fmt.Println("Prefix is " + conf.Prefix)
