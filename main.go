@@ -34,7 +34,7 @@ var (
 )
 
 func init() {
-	is2Cloud = flag.Bool("cloud", false, "if set, the program will exit if no config is found or is invalid")
+	is2Cloud = flag.Bool("c", false, "if set, the program will exit if no config is found or is invalid")
 	flag.Parse()
 }
 
