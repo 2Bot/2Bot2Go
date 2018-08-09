@@ -48,7 +48,7 @@ func createConfig() error {
 
 	inputPrefix()
 
-	file, err := os.OpenFile("config.toml", os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0660)
+	file, err := os.OpenFile("config/config.toml", os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0660)
 	if err != nil {
 		fmt.Println("Error creating config\n", err)
 		return err
@@ -120,7 +120,7 @@ func testLogin() error {
 }
 
 func loadConfig() error {
-	if _, err := toml.DecodeFile("config.toml", conf); err != nil {
+	if _, err := toml.DecodeFile("config/config.toml", conf); err != nil {
 		return err
 	}
 	return nil
@@ -169,7 +169,7 @@ func main() {
 	}
 
 	fmt.Println("Prefix is " + conf.Prefix)
-	infoLog.Println("Prefix is " + conf.Prefix)
+	//infoLog.Println("Prefix is " + conf.Prefix)
 
 	if dg == nil {
 		if err := testLogin(); err != nil {
