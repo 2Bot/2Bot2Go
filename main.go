@@ -169,7 +169,7 @@ func main() {
 	}
 
 	fmt.Println("Prefix is " + conf.Prefix)
-	infoLog.Println("Prefix is " + conf.Prefix)
+	//infoLog.Println("Prefix is " + conf.Prefix)
 
 	if dg == nil {
 		if err := testLogin(); err != nil {

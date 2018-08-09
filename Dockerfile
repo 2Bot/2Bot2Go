@@ -2,18 +2,18 @@ FROM golang:alpine
 
 RUN apk update && \
     apk add --no-cache git
-    
-RUN go get -v github.com/2Bot/2Bot2Go
+
+RUN go get github.com/2Bot/2Bot2Go
+
+RUN mkdir -p /go/emoji && mkdir -p /go/config
 
 WORKDIR /go/src/github.com/2Bot/2Bot2Go
 
-#COPY . .
+ENV GOBIN=/go/
 
-ENV GOBIN=/go
+RUN go install -v ./...
 
-RUN go get -v ./... && go install -v ./...
-
-VOLUME ["/go/emoji", "/go/config"]
+VOLUME ["/go/emoji", "/go/config/config.toml"]
 
 WORKDIR /go
 
